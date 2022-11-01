@@ -35,26 +35,4 @@ class CustomerController extends Controller
         $projects = $query->paginate($length);
         return ['data' => $projects, 'draw' => $request->input('draw')];
     }
-
-    public function getUsers(Request $request)
-    {
-        if ($request->input('showdata')) {
-            return Customer::orderBy('created_at', 'desc')->get();
-        }
-        $columns = ['name', 'phone', 'created_at'];
-        $length = $request->input('length');
-        $column = $request->input('column');
-        $search_input = $request->input('search');
-        $query = Customer::select('name', 'phone', 'created_at')
-            ->orderBy($columns[$column]);
-        if ($search_input) {
-            $query->where(function ($query) use ($search_input) {
-                $query->where('name', 'like', '%' . $search_input . '%')
-                    ->orWhere('phone', 'like', '%' . $search_input . '%')
-                    ->orWhere('created_at', 'like', '%' . $search_input . '%');
-            });
-        }
-        $users = $query->paginate($length);
-        return ['data' => $users];
-    }
 }
