@@ -5356,6 +5356,8 @@ __webpack_require__.r(__webpack_exports__);
     });
     return {
       customers: [],
+      excel_data: [],
+      ReportTitle: "report",
       columns: columns,
       sortKey: "deadline",
       sortOrders: sortOrders,
@@ -5417,6 +5419,41 @@ __webpack_require__.r(__webpack_exports__);
       return array.findIndex(function (i) {
         return i[key] == value;
       });
+    },
+    generateExcel: function generateExcel() {
+      this.excel_data = document.getElementById("report-container").innerHTML;
+      var blob = new Blob([this.excel_data], {
+        type: "application/ms-excel"
+      });
+      var link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = this.ReportTitle + ".xls";
+      link.click();
+    },
+    generateCsv: function generateCsv() {
+      var csv = [];
+      var rows = document.querySelectorAll("table tr");
+      for (var i = 0; i < rows.length; i++) {
+        var row = [],
+          cols = rows[i].querySelectorAll("td, th");
+        for (var j = 0; j < cols.length; j++) {
+          row.push(cols[j].innerText);
+        }
+        csv.push(row.join(","));
+      }
+
+      // Download CSV file
+      this.downloadCSV(csv.join("\n"));
+    },
+    downloadCSV: function downloadCSV(csvData) {
+      var csv_data = csvData;
+      var blob = new Blob([csv_data], {
+        type: "text/csv;charset=utf-8"
+      });
+      var link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = this.ReportTitle + ".csv";
+      link.click();
     }
   }
 });
@@ -5519,7 +5556,17 @@ var render = function render() {
         "for": column.label
       }
     }, [_vm._v(_vm._s(column.label))])]);
-  })], 2), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _c("a", {
+    staticClass: "download-pg2 is-small pagination-previous",
+    on: {
+      click: _vm.generateCsv
+    }
+  }, [_vm._v("\n      Download Csv\n    ")]), _vm._v(" "), _c("a", {
+    staticClass: "download-pg2 is-small pagination-previous",
+    on: {
+      click: _vm.generateExcel
+    }
+  }, [_vm._v("\n      Download Excel\n    ")])], 2), _vm._v(" "), _c("div", {
     staticClass: "tableFilters"
   }, [_c("input", {
     directives: [{
@@ -5575,7 +5622,11 @@ var render = function render() {
         value: records
       }
     }, [_vm._v("\n            " + _vm._s(records) + "\n          ")]);
-  }), 0)])])]), _vm._v(" "), _c("datatable", {
+  }), 0)])])]), _vm._v(" "), _c("div", {
+    attrs: {
+      id: "report-container"
+    }
+  }, [_c("datatable", {
     attrs: {
       columns: _vm.columns,
       sortKey: _vm.sortKey,
@@ -5588,7 +5639,7 @@ var render = function render() {
     return _c("tr", {
       key: customer.id
     }, [_vm.columns[0].visible ? _c("td", [_vm._v(_vm._s(customer.id))]) : _vm._e(), _vm._v(" "), _vm.columns[1].visible ? _c("td", [_vm._v(_vm._s(customer.name))]) : _vm._e(), _vm._v(" "), _vm.columns[2].visible ? _c("td", [_vm._v(_vm._s(customer.phone))]) : _vm._e()]);
-  }), 0)]), _vm._v(" "), _c("pagination", {
+  }), 0)])], 1), _vm._v(" "), _c("pagination", {
     attrs: {
       pagination: _vm.pagination
     },
@@ -11091,7 +11142,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hide-cm[data-v-4fd97649] {\n  margin-bottom: 5px;\n}\n.lb[data-v-4fd97649] {\n  padding: 5px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hide-cm[data-v-4fd97649] {\n  margin-bottom: 5px;\n}\n.download-pg2[data-v-4fd97649] {\n  float: right;\n  font: bold 15px Arial;\n  text-decoration: none;\n  background-color: #eeeeee;\n  color: #0d6efd;\n  padding: 5px 9px 4px 8px;\n  border-top: 1px solid #cccccc;\n  border-right: 1px solid #333333;\n  border-bottom: 1px solid #333333;\n  border-left: 1px solid #cccccc;\n}\n.lb[data-v-4fd97649] {\n  padding: 5px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

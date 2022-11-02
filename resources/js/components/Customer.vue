@@ -12,6 +12,15 @@
         />
         <label class="lb" :for="column.label">{{ column.label }}</label>
       </span>
+      <a class="download-pg2 is-small pagination-previous" @click="generateCsv">
+        Download Csv
+      </a>
+      <a
+        class="download-pg2 is-small pagination-previous"
+        @click="generateExcel"
+      >
+        Download Excel
+      </a>
     </div>
     <div class="tableFilters">
       <input
@@ -36,20 +45,22 @@
         </div>
       </div>
     </div>
-    <datatable
-      :columns="columns"
-      :sortKey="sortKey"
-      :sortOrders="sortOrders"
-      @sort="sortBy"
-    >
-      <tbody>
-        <tr v-for="customer in customers" :key="customer.id">
-          <td v-if="columns[0].visible">{{ customer.id }}</td>
-          <td v-if="columns[1].visible">{{ customer.name }}</td>
-          <td v-if="columns[2].visible">{{ customer.phone }}</td>
-        </tr>
-      </tbody>
-    </datatable>
+    <div id="report-container">
+      <datatable
+        :columns="columns"
+        :sortKey="sortKey"
+        :sortOrders="sortOrders"
+        @sort="sortBy"
+      >
+        <tbody>
+          <tr v-for="customer in customers" :key="customer.id">
+            <td v-if="columns[0].visible">{{ customer.id }}</td>
+            <td v-if="columns[1].visible">{{ customer.name }}</td>
+            <td v-if="columns[2].visible">{{ customer.phone }}</td>
+          </tr>
+        </tbody>
+      </datatable>
+    </div>
     <pagination
       :pagination="pagination"
       @prev="getCustomers(pagination.prevPageUrl)"
@@ -85,6 +96,8 @@ export default {
     });
     return {
       customers: [],
+      excel_data: [],
+      ReportTitle: "report",
       columns: columns,
       sortKey: "deadline",
       sortOrders: sortOrders,
@@ -144,6 +157,40 @@ export default {
     getIndex(array, key, value) {
       return array.findIndex((i) => i[key] == value);
     },
+    generateExcel() {
+      this.excel_data = document.getElementById("report-container").innerHTML;
+      let blob = new Blob([this.excel_data], { type: "application/ms-excel" });
+      let link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = this.ReportTitle + ".xls";
+      link.click();
+    },
+    generateCsv() {
+      let csv = [];
+      let rows = document.querySelectorAll("table tr");
+
+      for (var i = 0; i < rows.length; i++) {
+        var row = [],
+          cols = rows[i].querySelectorAll("td, th");
+
+        for (var j = 0; j < cols.length; j++) row.push(cols[j].innerText);
+
+        csv.push(row.join(","));
+      }
+
+      // Download CSV file
+      this.downloadCSV(csv.join("\n"));
+    },
+    downloadCSV(csvData) {
+      let csv_data = csvData;
+      let blob = new Blob([csv_data], {
+        type: "text/csv;charset=utf-8",
+      });
+      let link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = this.ReportTitle + ".csv";
+      link.click();
+    },
   },
 };
 </script>
@@ -151,6 +198,18 @@ export default {
 <style scoped>
 .hide-cm {
   margin-bottom: 5px;
+}
+.download-pg2 {
+  float: right;
+  font: bold 15px Arial;
+  text-decoration: none;
+  background-color: #eeeeee;
+  color: #0d6efd;
+  padding: 5px 9px 4px 8px;
+  border-top: 1px solid #cccccc;
+  border-right: 1px solid #333333;
+  border-bottom: 1px solid #333333;
+  border-left: 1px solid #cccccc;
 }
 .lb {
   padding: 5px;
